@@ -1,7 +1,7 @@
 header {
   background-color: #303841;
-  height: 100px;
-
+  height: auto;
+  padding-bottom: 5px;
 }
 h1{
   text-align: center;

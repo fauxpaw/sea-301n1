@@ -9,6 +9,17 @@ filterView.navTabs = function() {
   });
 };
 
+filterView.menu = function() {
+  $('.icon-menu').on('click', function(event){
+    event.preventDefault();
+    $('.top-nav').toggle(1000);
+  });
+};
+
 $(document).ready(function(){
   filterView.navTabs();
+  filterView.menu();
+  if(screen < 400){
+    $('.icon-menu').click();
+  }
 });
