@@ -22,14 +22,14 @@
   // DONE: Set up a DB table for articles.
   Article.createTable = function(callback) {
     webDB.execute(
-      'CREATE TABLE IF NOT EXISTS articles ('
-      + 'id INTEGER PRIMARY KEY, '
-      + 'title VARCHAR(75), '
-      + 'author VARCHAR(75), '
-      + 'authorUrl VARCHAR(255), '
-      + 'category VARCHAR(50) '
-      + 'publishedOn DATETIME '
-      + 'body TEXT',
+      'CREATE TABLE IF NOT EXISTS articles (' +
+        'id INTEGER PRIMARY KEY, ' +
+        'title VARCHAR(255) NOT NULL, ' +
+        'author VARCHAR(255) NOT NULL, ' +
+        'authorURL VARCHAR (255), ' +
+        'category VARCHAR(20), ' +
+        'publishedOn DATETIME, ' +
+        'body TEXT NOT NULL);',
       function(result) {
         console.log('Successfully set up the articles table.', result);
         if (callback) callback();
@@ -96,22 +96,27 @@
   // we need to retrieve the JSON and process it.
   // If the DB has data already, we'll load up the data (sorted!), and then hand off control to the View.
   Article.fetchAll = function(next) {
-    webDB.execute('SELECT * FROM articles ORDER BY publishedOn DESC', function(rows) {
+    console.log('getting data...');
+    webDB.execute('SELECT * FROM articles', function(rows) {
       if (rows.length) {
+        console.log("we goin rows...");
         // Now instanitate those rows with the .loadAll function, and pass control to the view.
         Article.loadAll(rows);
         next();
 
       } else {
-        $.getJSON('/data/hackerIpsum.json', function(rawData) {
+        console.log("not rows...");
+        $.getJSON('data/hackerIpsum.json', function(rawData) {
           // Cache the json, so we don't need to request it next time:
+          localStorage.rawData = JSON.stringify(rawData);
           rawData.forEach(function(item) {
             var article = new Article(item); // Instantiate an article based on item from JSON
             // Cache the newly-instantiated article in DB:
             article.insertRecord();
           });
           // Now get ALL the records out the DB, with their database IDs:
-          webDB.execute('SELECT * FROM articles', function(rows) {
+          webDB.execute('SELECT * FROM articles ORDER BY publishedOn DESC', function(rows) {
+            console.log('DATA created, loading up!');
             // Now instanitate those rows with the .loadAll function, and pass control to the view.
             Article.loadAll(rows);
             next();
